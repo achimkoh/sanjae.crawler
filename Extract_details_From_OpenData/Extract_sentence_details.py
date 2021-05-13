@@ -26,14 +26,14 @@ counts_for_Cases = API.get_Types_counts(KindA_precedent_result_type_list,KindB_c
 # 조회 된 정보 엑셀로 저장
 df = DataFrame(counts_for_Cases,columns=['판결유형','사건유형','사고질병 구분','개수'])
 today = datetime.datetime.today()
-filename = '유형별_사건_개수_'+str(today.year)+'_'+str(today.month)+'_'+str(today.day)+'.xlsx'
-df.to_excel(filename,index=False, header=True)
+filename = 'case_count_'+str(today.year)+'_'+str(today.month)+'_'+str(today.day)+'.xlsx'
+df.to_excel(filename,index=False, header=True, encoding='utf8')
 
 #### 사건 상세 내용 조회
 details_for_Cases = API.get_detials_for_Cases(counts_for_Cases)
 
 df = DataFrame(details_for_Cases,columns=['사건번호','법원','판결유형','사건유형','사고질병 구분','판결문','제목','연관사건'])
-filename = '사건상세_'+str(today.year)+'_'+str(today.month)+'_'+str(today.day)+'.xlsx'
-df.to_excel(filename,index=False, header=True)
+filename = 'sentence_'+str(today.year)+'_'+str(today.month)+'_'+str(today.day)+'.xlsx'
+df.to_excel(filename,index=False, header=True, encoding='utf8')
 
 print("---------------------- 출력 완료 -------------------------")

@@ -6,6 +6,8 @@ BASE_URL = 'http://apis.data.go.kr/B490001/sjPrecedentInfoService/'
 # API Key - 주로 Encoding Service Key가 사용되고 있음.
 encSvcKey = '-------------------------YOUR ENCODING SERVICE KEY---------------------------------'
 
+TIMEOUT_LIMIT = 1000
+
 # 판결 유형 조회
 def get_KindA_PrecedentResult_types():
     #유형의 개수가 많지 않으므로 한 페이지에 다 조회 되도록 함
@@ -13,7 +15,7 @@ def get_KindA_PrecedentResult_types():
 
     reqURL = get_sentence_API_url.format(encSvcKey)
     # Timeout 시간은 특별한 기준이 있는 것은 아니고 충분히 넉넉히 부여하였음.
-    result = requests.get(reqURL, timeout=10)
+    result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
 
     soup = BeautifulSoup(result.content, 'lxml')
     items = soup.find_all('kinda')
@@ -30,7 +32,7 @@ def get_KindB_case_types():
 
     reqURL = get_case_API_url.format(encSvcKey)
     # Timeout 시간은 특별한 기준이 있는 것은 아니고 충분히 넉넉히 부여하였음.
-    result = requests.get(reqURL, timeout=10)
+    result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
 
     soup = BeautifulSoup(result.content, 'lxml')
     items = soup.find_all('kindb')
@@ -47,7 +49,7 @@ def get_KindC_AccidentDisease_types():
 
     reqURL = get_AccidentDisease_API_url.format(encSvcKey)
     # Timeout 시간은 특별한 기준이 있는 것은 아니고 충분히 넉넉히 부여하였음.
-    result = requests.get(reqURL, timeout=10)
+    result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
 
     soup = BeautifulSoup(result.content, 'lxml')
     items = soup.find_all('kindc')
@@ -66,7 +68,7 @@ def get_Types_counts(kindA_types_list, kindB_types_list, kindC_types_list):
         for tB in kindB_types_list:
             for tC in kindC_types_list:
                 reqURL = get_types_count_URL.format(encSvcKey, tA, tB, tC)
-                result = requests.get(reqURL, timeout=10)
+                result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
 
                 soup = BeautifulSoup(result.content, 'lxml')
                 cnt = int(soup.cnt.string)
@@ -95,7 +97,7 @@ def get_detials_for_Cases(counts_for_Cases):
         for pageIdx in range(0,numPage+1):
             #detailURL = BASE_URL + 'getSjPrecedentNaeyongPstate?ServiceKey={}&kindA={}&kindB={}&kindC={}&numOfRows={}&pageNo={}'
             reqURL = detailURL.format(encSvcKey, case[0], case[1], case[2],numOfRows,pageIdx+1)
-            result = requests.get(reqURL, timeout=100)
+            result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
             soup = BeautifulSoup(result.content, 'lxml')
 
             # 조회 된 아이템 처리
