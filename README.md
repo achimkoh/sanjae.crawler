@@ -21,7 +21,7 @@ https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15041878
     
     encSvcKey ='----------YOUR ENCODING KEY-------------------'
 
- 2. Extract_sentence_details.py 를 실행함
+ 2. extract_sentence_details.py 를 실행함
  3. 각 사건 상세 내용이 기록 된 엑셀 파일이 'sentenc_날짜.xlsx' 형식으로 생성 됨.
  4. 연관 재판 정보는 상세 내용 파일의 마지막 컬럼을 엑셀의 데이터 분리 기능으로 쉼표와 빼기를 구분자로 하여 나누면 됨.(예외 Case가 있음)
 
