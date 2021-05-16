@@ -16,10 +16,13 @@ https://github.com/Code-for-Korea/Industrial_disasters
 근로복지공단_산재보험 판례 판결문 조회 서비스 데이터 활용
 
 - 사용법
- 1. API_Industrial_disasters.py 에 발급받은 라이센스 키(Encoded)를 설정함.
+ 1. API_Industrial_disasters.py 에 발급받은 라이센스 키(Encoded)를 Extract_sentence_details.py와 같은 위치에 userkey.py라고 만들고, 아래와 같은 변수명에 본인의 키를 설정함.
+    
+    encSvcKey ='----------YOUR ENCODING KEY-------------------'
+
  2. Extract_sentence_details.py 를 실행함
- 3. 유형별 사건 개수와 각 사건 상세 내용이 기록 된 엑셀 파일이 2개 생성 됨.
- 4. 연관 재판 정보는 상세 내용 파일의 마지막 컬럼을 엑셀의 데이터 분리 기능으로 쉼표와 빼기를 구분자로 하여 나누면 됨.
+ 3. 각 사건 상세 내용이 기록 된 엑셀 파일이 'sentenc_날짜.xlsx' 형식으로 생성 됨.
+ 4. 연관 재판 정보는 상세 내용 파일의 마지막 컬럼을 엑셀의 데이터 분리 기능으로 쉼표와 빼기를 구분자로 하여 나누면 됨.(예외 Case가 있음)
 
 - 보완 할 사항
  1. 추출 된 판례 데이터 자체도 소중하지만, 근로자가 자신과 관련 된 질병에 대한 판례를 검색 해 보는데 활용 할 수 있게 해야 함.

@@ -128,3 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /Extract_details_From_OpenData/*.xlsx
+/Extract_details_From_OpenData/userkey.py

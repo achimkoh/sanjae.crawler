@@ -1,12 +1,11 @@
 import requests                 # API 연결
 from bs4 import BeautifulSoup   # XML 파싱
+import userkey                  # 공공데이터 포털에서 발급 받은 서비스키 (개인에게 발급되므로 각자 자기 코드 사용)
 
 # API Base URL
 BASE_URL = 'http://apis.data.go.kr/B490001/sjPrecedentInfoService/'
 # API Key - 주로 Encoding Service Key가 사용되고 있음.
-encSvcKey = '-------------------------YOUR ENCODING SERVICE KEY---------------------------------'
-
-TIMEOUT_LIMIT = 1000
+encSvcKey = userkey.encSvcKey
 
 # 판결 유형 조회
 def get_KindA_PrecedentResult_types():
@@ -15,7 +14,7 @@ def get_KindA_PrecedentResult_types():
 
     reqURL = get_sentence_API_url.format(encSvcKey)
     # Timeout 시간은 특별한 기준이 있는 것은 아니고 충분히 넉넉히 부여하였음.
-    result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
+    result = requests.get(reqURL, timeout=1000)
 
     soup = BeautifulSoup(result.content, 'lxml')
     items = soup.find_all('kinda')
@@ -32,7 +31,7 @@ def get_KindB_case_types():
 
     reqURL = get_case_API_url.format(encSvcKey)
     # Timeout 시간은 특별한 기준이 있는 것은 아니고 충분히 넉넉히 부여하였음.
-    result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
+    result = requests.get(reqURL, timeout=1000)
 
     soup = BeautifulSoup(result.content, 'lxml')
     items = soup.find_all('kindb')
@@ -49,7 +48,7 @@ def get_KindC_AccidentDisease_types():
 
     reqURL = get_AccidentDisease_API_url.format(encSvcKey)
     # Timeout 시간은 특별한 기준이 있는 것은 아니고 충분히 넉넉히 부여하였음.
-    result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
+    result = requests.get(reqURL, timeout=1000)
 
     soup = BeautifulSoup(result.content, 'lxml')
     items = soup.find_all('kindc')
@@ -68,7 +67,7 @@ def get_Types_counts(kindA_types_list, kindB_types_list, kindC_types_list):
         for tB in kindB_types_list:
             for tC in kindC_types_list:
                 reqURL = get_types_count_URL.format(encSvcKey, tA, tB, tC)
-                result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
+                result = requests.get(reqURL, timeout=1000)
 
                 soup = BeautifulSoup(result.content, 'lxml')
                 cnt = int(soup.cnt.string)
@@ -77,6 +76,20 @@ def get_Types_counts(kindA_types_list, kindB_types_list, kindC_types_list):
                 print(tA,tB,tC,cnt)
 
     return types_counts_list
+
+# 전체 개수 조회
+def get_all_cases_counts():
+    types_counts_list = []
+    get_types_count_URL = BASE_URL + 'getYuhyeongByCountPstate?serviceKey={}&numOfRows=100&pageNo=1'
+
+    reqURL = get_types_count_URL.format(encSvcKey)
+    result = requests.get(reqURL, timeout=1000)
+
+    soup = BeautifulSoup(result.content, 'lxml')
+    cnt = int(soup.cnt.string)
+
+    return cnt
+
 
 # 사건 상세 내용 조회
 def get_detials_for_Cases(counts_for_Cases):
@@ -97,7 +110,7 @@ def get_detials_for_Cases(counts_for_Cases):
         for pageIdx in range(0,numPage+1):
             #detailURL = BASE_URL + 'getSjPrecedentNaeyongPstate?ServiceKey={}&kindA={}&kindB={}&kindC={}&numOfRows={}&pageNo={}'
             reqURL = detailURL.format(encSvcKey, case[0], case[1], case[2],numOfRows,pageIdx+1)
-            result = requests.get(reqURL, timeout=TIMEOUT_LIMIT)
+            result = requests.get(reqURL, timeout=1000)
             soup = BeautifulSoup(result.content, 'lxml')
 
             # 조회 된 아이템 처리
@@ -127,5 +140,65 @@ def get_detials_for_Cases(counts_for_Cases):
                 details_list.append([accnum, courtname, kinda, kindb, kindc, noncontent, title, noncontent[start_pos+6:end_pos].strip()])
 
         print("Done - ", case)
+
+    return details_list
+
+
+# 사건 상세 내용 조회
+def get_all_detials_for_Cases():
+    detailURL = BASE_URL + 'getSjPrecedentNaeyongPstate?ServiceKey={}&numOfRows={}&pageNo={}'
+    related_key = '연관판결 : ' #연관판결 정보 포함 여부 확인 키워드
+    details_list = []
+
+    # 사건 개수가 0이 아니면 사건 정보들을 추출하여 더함.
+    # 한페이지당 100개씩
+    numCount = get_all_cases_counts()
+    numOfRows = 300
+    numPage = numCount // numOfRows
+
+    # 여러 건이 조회 되었을 경우, 페이지 단위로 처리함.
+    for pageIdx in range(0,numPage+1):
+        #detailURL = BASE_URL + 'getSjPrecedentNaeyongPstate?ServiceKey={}&numOfRows={}&pageNo={}'
+        reqURL = detailURL.format(encSvcKey, numOfRows,pageIdx+1)
+        result = requests.get(reqURL, timeout=1000)
+        soup = BeautifulSoup(result.content, 'lxml')
+
+        print(pageIdx,numPage)
+        # 조회 된 아이템 처리
+        items = soup.find_all('item')
+        for item in items:
+            accnum = item.accnum.string
+            courtname = item.courtname.string
+            kinda = "-"
+            kindb = "-"
+            kindc = "-"
+
+            if item.kinda is not None:
+                kinda = item.kinda.string
+
+            if item.kindb is not None:
+                kindb = item.kindb.string
+
+            if item.kindc is not None:
+                kindc = item.kindc.string
+
+            noncontent = item.noncontent.string
+            title = item.title.string
+
+            # 연관판결 여부 확인 - '연관판결 : '
+            start_pos = noncontent.find(related_key)
+            if start_pos < 0:   # 연관판결 정보 없음.
+                details_list.append([accnum, courtname, kinda, kindb, kindc, noncontent, title, ' '])
+                continue
+
+            # 연관 판결이 포함되어 있다면 연관판결 키워드부터 '주문' 혹은 '주 문' 앞까지를 잘라냄.
+            # 주문이 한번만 있다고 가정함. 실제 데이터에 띄어쓰기가 있는 것과 없는 것이 있었음.
+            end_pos = max(noncontent.find('주문'),noncontent.find('주 문'))
+            if end_pos < 0: #주문이 없으면 연관 재판 정보만 있는 경우로, 끝까지
+                details_list.append([accnum, courtname, kinda, kindb, kindc, noncontent, title, noncontent[start_pos+6:].strip()])
+                continue
+
+            details_list.append([accnum, courtname, kinda, kindb, kindc, noncontent, title, noncontent[start_pos+6:end_pos].strip()])
+
 
     return details_list
