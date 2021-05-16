@@ -12,7 +12,8 @@ https://drive.google.com/drive/folders/1gKOPq0uhw_P0eIyBnG9eYKw3MhMC1mUE?usp=sha
 ## 관련 프로젝트
 
 ###  산재 판례 데이터 수집
-https://github.com/Code-for-Korea/Industrial_disasters
+https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15041878
+
 근로복지공단_산재보험 판례 판결문 조회 서비스 데이터 활용
 
 - 사용법
