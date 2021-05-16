@@ -1,6 +1,7 @@
 import requests                 # API 연결
 from bs4 import BeautifulSoup   # XML 파싱
 import userkey                  # 공공데이터 포털에서 발급 받은 서비스키 (개인에게 발급되므로 각자 자기 코드 사용)
+import re                       # 정규식으로 정보 추출
 
 # API Base URL
 BASE_URL = 'http://apis.data.go.kr/B490001/sjPrecedentInfoService/'
@@ -8,6 +9,9 @@ BASE_URL = 'http://apis.data.go.kr/B490001/sjPrecedentInfoService/'
 ENCODED_SERVICE_KEY = userkey.encSvcKey
 NUM_OF_ROWS = 300
 TIMEOUT = 1000
+
+#연관판결 추출
+regex = re.compile(r'(?:연관판결 \: )(.*)(?: ){3,}')
 
 
 # 판결 유형 조회
@@ -128,20 +132,12 @@ def get_cases_for_types(counts_for_cases):
                 ruling_text = item.noncontent.string    # 판결문
                 case_title = item.title.string
 
-                # 연관판결 여부 확인 - '연관판결 : '
-                start_pos = ruling_text.find(related_key)
-                if start_pos < 0:   # 연관판결 정보 없음.
+                # 연관 재판 추출
+                related_cases = extract_related_cases(ruling_text)
+                if related_cases is None:
                     details_list.append([case_number, court_name, ruling_type, case_type, issue_category, ruling_text, case_title, ' '])
-                    continue
-
-                # 연관 판결이 포함되어 있다면 연관판결 키워드부터 '주문' 혹은 '주 문' 앞까지를 잘라냄.
-                # 주문이 한번만 있다고 가정함. 실제 데이터에 띄어쓰기가 있는 것과 없는 것이 있었음.
-                end_pos = max(ruling_text.find('주문'), ruling_text.find('주 문'))
-                if end_pos < 0:  # 주문이 없으면 연관 재판 정보만 있는 경우로, 끝까지
-                    details_list.append([case_number, court_name, ruling_type, case_type, issue_category, ruling_text, case_title, ruling_text[start_pos+6:].strip()])
-                    continue
-
-                details_list.append([case_number, court_name, ruling_type, case_type, issue_category, ruling_text, case_title, ruling_text[start_pos+6:end_pos].strip()])
+                else:
+                    details_list.append([case_number, court_name, ruling_type, case_type, issue_category, ruling_text, case_title, related_cases])
 
         print("Done - ", case)
 
@@ -151,7 +147,6 @@ def get_cases_for_types(counts_for_cases):
 # 사건 상세 내용 조회
 def get_all_cases():
     detail_url = BASE_URL + 'getSjPrecedentNaeyongPstate?ServiceKey={}&numOfRows={}&pageNo={}'
-    related_key = '연관판결 : '  # 연관판결 정보 포함 여부 확인 키워드
     details_list = []
 
     # 사건 개수가 0이 아니면 사건 정보들을 추출하여 더함.
@@ -187,19 +182,20 @@ def get_all_cases():
             ruling_text = item.noncontent.string    # 판결문
             case_title = item.title.string          # 제목
 
-            # 연관판결 여부 확인 - '연관판결 : '
-            start_pos = ruling_text.find(related_key)
-            if start_pos < 0:   # 연관판결 정보 없음.
+            # 연관 재판 추출
+            related_cases = extract_related_cases(ruling_text)
+            if related_cases is None:
                 details_list.append([case_number, court_name, ruling_type, case_type, issue_category, ruling_text, case_title, ' '])
-                continue
-
-            # 연관 판결이 포함되어 있다면 연관판결 키워드부터 '주문' 혹은 '주 문' 앞까지를 잘라냄.
-            # 주문이 한번만 있다고 가정함. 실제 데이터에 띄어쓰기가 있는 것과 없는 것이 있었음.
-            end_pos = max(ruling_text.find('주문'), ruling_text.find('주 문'))
-            if end_pos < 0:  # 주문이 없으면 연관 재판 정보만 있는 경우로, 끝까지
-                details_list.append([case_number, court_name, ruling_type, case_type, issue_category, ruling_text, case_title, ruling_text[start_pos+6:].strip()])
-                continue
-
-            details_list.append([case_number, court_name, ruling_type, case_type, issue_category, ruling_text, case_title, ruling_text[start_pos+6:end_pos].strip()])
+            else:
+                details_list.append([case_number, court_name, ruling_type, case_type, issue_category, ruling_text, case_title, related_cases])
 
     return details_list
+
+# 판결문에서 연관재판 정보 추출 - 없으면 None
+def extract_related_cases(ruling_text):
+    matched_part = regex.search(ruling_text)
+    if matched_part is None:
+        return None
+    matched_string = matched_part.group()
+    return matched_string[6:].strip()
+
