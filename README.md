@@ -11,6 +11,10 @@ https://drive.google.com/drive/folders/1gKOPq0uhw_P0eIyBnG9eYKw3MhMC1mUE?usp=sha
 
 ## 관련 프로젝트
 
+### 웹 기반 판례 데이터 조회
+https://github.com/Code-for-Korea/sanjae.server
+
+
 ###  산재 판례 데이터 수집
 https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15041878
 
