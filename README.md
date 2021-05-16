@@ -16,7 +16,7 @@ https://github.com/Code-for-Korea/Industrial_disasters
 근로복지공단_산재보험 판례 판결문 조회 서비스 데이터 활용
 
 - 사용법
- 1. API_Industrial_disasters.py 에 발급받은 라이센스 키(Encoded)를 Extract_sentence_details.py와 같은 위치에 userkey.py라고 만들고, 아래와 같은 변수명에 본인의 키를 설정함.
+ 1. api_industrial_disasters.py 에 발급받은 라이센스 키(Encoded)를 extract_sentence_details.py와 같은 위치에 userkey.py라고 만들고, 아래와 같은 변수명에 본인의 키를 설정함.
     
     encSvcKey ='----------YOUR ENCODING KEY-------------------'
 

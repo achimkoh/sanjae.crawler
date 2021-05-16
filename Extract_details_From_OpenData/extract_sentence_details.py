@@ -4,7 +4,7 @@ Code for Korea - #p-산업재해
 2021/05/03 바른생활 심원일
 '''
 
-import API_Industrial_disasters as API
+import api_industrial_disasters as API
 from pandas import DataFrame    # 코드 없이 데이터 분석을 용이하게 할 수 있도록 엑셀로 저장
 import datetime                 # 저장 파일 이름에 날짜 사용
 
@@ -41,9 +41,9 @@ df.to_excel(filename,index=False, header=True, encoding='utf8')
 #details_for_Cases = API.get_detials_for_Cases(counts_for_Cases)
 
 #변경 후 - 타입 정보 없이 전체 데이터 조회
-details_for_Cases = API.get_all_detials_for_Cases()
+all_cases = API.get_all_cases()
 
-df = DataFrame(details_for_Cases,columns=['사건번호','법원','판결유형','사건유형','사고질병 구분','판결문','제목','연관사건'])
+df = DataFrame(all_cases, columns=['사건번호', '법원', '판결유형', '사건유형', '사고질병 구분', '판결문', '제목', '연관사건'])
 filename = 'sentence_'+str(today.year)+'_'+str(today.month)+'_'+str(today.day)+'.xlsx'
 df.to_excel(filename,index=False, header=True, encoding='utf8')
 
