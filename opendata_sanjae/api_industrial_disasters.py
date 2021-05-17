@@ -1,12 +1,14 @@
 import requests                 # API 연결
 from bs4 import BeautifulSoup   # XML 파싱
-import userkey                  # 공공데이터 포털에서 발급 받은 서비스키 (개인에게 발급되므로 각자 자기 코드 사용)
+# import userkey                  # 공공데이터 포털에서 발급 받은 서비스키 (개인에게 발급되므로 각자 자기 코드 사용)
 import re                       # 정규식으로 정보 추출
+import datetime                 # 저장 파일 이름에 날짜 사용
 
 # API Base URL
 BASE_URL = 'http://apis.data.go.kr/B490001/sjPrecedentInfoService/'
 # API Key
-ENCODED_SERVICE_KEY = userkey.encSvcKey
+# ENCODED_SERVICE_KEY = userkey.encSvcKey
+ENCODED_SERVICE_KEY = ''
 NUM_OF_ROWS = 300
 TIMEOUT = 1000
 
@@ -199,3 +201,16 @@ def extract_related_cases(ruling_text):
     matched_string = matched_part.group()
     return matched_string[6:].strip()
 
+def save_all_cases_excel():
+    today = datetime.datetime.today()
+    all_cases = get_all_cases()
+    df = DataFrame(all_cases, columns=['사건번호', '법원', '판결유형', '사건유형', '사고질병 구분', '판결문', '제목', '연관사건'])
+    filename = 'sentence_'+str(today.year)+'_'+str(today.month)+'_'+str(today.day)+'.xlsx'
+    df.to_excel(filename, index=False, header=True, encoding='utf8')
+
+def save_all_cases_csv():
+    today = datetime.datetime.today()
+    all_cases = get_all_cases()
+    df = DataFrame(all_cases, columns=['사건번호', '법원', '판결유형', '사건유형', '사고질병 구분', '판결문', '제목', '연관사건'])
+    filename = 'sentence_'+str(today.year)+'_'+str(today.month)+'_'+str(today.day)+'.csv'
+    df.to_csv(filename, index=False, header=True, encoding='utf8')
