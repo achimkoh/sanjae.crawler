@@ -119,7 +119,7 @@ class API:
         return details_list
 
     # 판결문에서 연관재판 정보 추출 - 없으면 빈 문자열
-    def extract_related_cases(ruling_text):
+    def extract_related_cases(self, ruling_text):
         # 연관판결 추출
         pattern = re.compile(r'(?:연관판결 \: )(.*)(?: ){3,}')
 
