@@ -13,6 +13,5 @@ setup(
         'beautifulsoup4',
         'lxml',
         'requests',
-        'pandas'
     ]
 )
