@@ -109,8 +109,8 @@ class API:
                 ruling_type = item.kinda.string if item.kinda else ''           # 판결 유형
                 case_type = item.kindb.string if item.kindb else ''             # 사건 유형
                 issue_category = item.kindc.string if item.kindc else ''        # 사고질병 구분
-                noncontent = item.noncontent.string if item.noncontent else ''  # 판결문
-                title = item.title.string if item.title else ''                 # 제목
+                ruling_text = item.noncontent.string if item.noncontent else ''  # 판결문
+                case_title = item.title.string if item.title else ''                 # 제목
 
                 # 연관 재판 추출
                 related_cases = self.extract_related_cases(ruling_text)
@@ -123,7 +123,7 @@ class API:
         # 연관판결 추출
         pattern = re.compile(r'(?:연관판결 \: )(.*)(?: ){3,}')
 
-        match_result = pattern.search(case_text)
+        match_result = pattern.search(ruling_text)
         if match_result is None:
             return ''
         return match_result.group(1)
