@@ -106,6 +106,7 @@ class API:
             for item in items:
                 case_number = item.accnum.string if item.accnum else ''         # 사건번호
                 court_name = item.courtname.string if item.courtname else ''    # 법원명
+                court_name = court_name.replace(' ', '')                        # 법원명에서 공백을 제거한다
                 ruling_type = item.kinda.string if item.kinda else ''           # 판결 유형
                 case_type = item.kindb.string if item.kindb else ''             # 사건 유형
                 issue_category = item.kindc.string if item.kindc else ''        # 사고질병 구분
